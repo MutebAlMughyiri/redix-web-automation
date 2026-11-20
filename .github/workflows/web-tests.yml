@@ -1,0 +1,57 @@
+# Every web test against a fresh Go server built from redix-api's main: Dev, an empty database, the admin named below, its web on 5020. On every
+# push, nightly, and from Actions' Run workflow. The Extent report is kept as the run's artifact. Never qa (redix-api #161).
+name: Web tests
+
+on:
+  push:
+  schedule:
+    - cron: '0 22 * * *'
+  workflow_dispatch:
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    env:
+      REDIX_ADMIN_USERNAME: ci-admin
+      REDIX_ADMIN_PASSWORD: Ci-admin-passw0rd
+      REDIX_ADMIN_NEW_PASSWORD: Ci-admin-chosen-1
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: redix-web-automation
+      - uses: actions/checkout@v7
+        with:
+          repository: MutebAlMughyiri/redix-api
+          path: redix-api
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: redix-api/go-backend/go.mod
+          cache-dependency-path: redix-api/go-backend/go.sum
+      - name: Start the API and its web, which bring the database up to date as they start
+        working-directory: redix-api/go-backend
+        env:
+          GOEXPERIMENT: jsonv2
+        run: |
+          # The admin's password is the environment's own, REDIX_Dev_Admin__Password (redix-api #118); Dev serves its web on 5020.
+          export REDIX_Environment=Dev REDIX_Admin__Username="$REDIX_ADMIN_USERNAME" REDIX_Dev_Admin__Password="$REDIX_ADMIN_PASSWORD"
+          export REDIX_Jwt__SigningKey="$(openssl rand -base64 64 | tr -d '\n')" REDIX_Database__Path="$RUNNER_TEMP/RedixDev.db"
+          go build -o "$RUNNER_TEMP/redix-server" ./cmd/server
+          nohup "$RUNNER_TEMP/redix-server" > "$RUNNER_TEMP/api.log" 2>&1 &
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+          cache-dependency-path: redix-web-automation/pom.xml
+      - run: mvn -B test
+        working-directory: redix-web-automation
+      - name: The Extent report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extent-report
+          path: redix-web-automation/target/extent-report
+          if-no-files-found: ignore
+      - name: The server's log, when a run fails
+        if: failure()
+        run: cat "$RUNNER_TEMP/api.log"

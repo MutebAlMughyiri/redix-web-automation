@@ -1,0 +1,5 @@
+# Which test project this repository drives (Testin). Committed, so a clone needs no setup: the test cases are in redix-web-test-cases,
+# and Testin writes a class per test set and a test method per test case into src/test/java.
+location: remote
+repoUrl: https://github.com/MutebAlMughyiri/redix-web-test-cases.git
+testinProject: redix-web-test-cases
