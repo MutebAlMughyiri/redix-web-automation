@@ -124,4 +124,18 @@ public class EntriesTest {
         assertThat(element("addEntry.description")).hasValue("Web payment");
         assertThat(element("entry.amount")).hasCount(0);
     }
+
+    @Test(description = "Change fills the form with a waiting entry, and saving changes its amount", testName = "642a5dde-a0f4-4855-8ca9-a75a979363c3", priority = 8)
+    public void changeFillsTheFormWithAWaitingEntryAndSavingChangesItsAmount() {
+        final @NotNull Ledger.Kept kept = Ledger.withEntries(List.of(), List.of(300));
+        onTheList(kept);
+        element("entries.row." + kept.entryIds().get(0)).click();
+        element("entry.change").click();
+        assertThat(element("addEntry.title")).hasText(Words.of("ar", "entries.edit"));
+        assertThat(element("addEntry.amount")).hasValue("300");
+        element("addEntry.amount").fill("350");
+        element("addEntry.send").click();
+        assertThat(element("addEntry.message")).hasText(Words.of("ar", "expenses.sent"));
+        assertThat(element("entry.amount")).hasText("350.00");
+    }
 }
