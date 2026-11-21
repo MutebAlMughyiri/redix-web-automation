@@ -71,4 +71,19 @@ public class AccountsTest {
         assertThat(element("accounts.group.cashCustody")).hasText(Words.of("ar", "accounts.custodies"));
         assertThat(page.locator("[id^='accounts.row.']").filter(new Locator.FilterOptions().setHasText("Site cash"))).isVisible();
     }
+
+    @Test(description = "Transfer opens once two accounts are active, and refuses more than the account holds", testName = "927b1cb7-398c-4f58-976b-6e4d2b14ecb8", priority = 4)
+    public void transferOpensOnceTwoAccountsAreActiveAndRefusesMoreThanTheAccountHolds() {
+        onAccounts(Ledger.withEntries(List.of(), List.of()));
+        assertThat(element("accounts.transfer")).isDisabled();
+        element("accounts.add").click();
+        element("accounts.accountName").fill("Reserve");
+        element("account.save").click();
+        assertThat(element("account.title")).hasText("Reserve");
+        element("accounts.transfer").click();
+        assertThat(element("transfer.title")).hasText(Words.of("ar", "transfers.title"));
+        element("transfer.amount").fill("100");
+        element("transfer.save").click();
+        assertThat(element("transfer.refusal")).hasText(Words.of("ar", "transfers.insufficientBalance"));
+    }
 }
