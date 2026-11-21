@@ -100,4 +100,15 @@ public class AccountsTest {
         assertThat(element("accounts.title")).isVisible();
         assertThat(element("reconciliation.actualTotal")).hasText("(100.00)");
     }
+
+    @Test(description = "The account history tells an approved entry and who approved it", testName = "eab0890b-d5f5-45e9-8a09-57219791558f", priority = 6)
+    public void theAccountHistoryTellsAnApprovedEntryAndWhoApprovedIt() {
+        final @NotNull Ledger.Kept kept = Ledger.withEntries(List.of(100), List.of());
+        final @NotNull Page page = onAccounts(kept);
+        element("accounts.history").click();
+        assertThat(element("accountHistory.title")).isVisible();
+        final @NotNull Locator approved = page.locator("[id^='accountHistory.line.']").filter(new Locator.FilterOptions().setHasText("100.00"));
+        assertThat(approved).containsText("Bank");
+        assertThat(approved).containsText(kept.manager().displayName());
+    }
 }
