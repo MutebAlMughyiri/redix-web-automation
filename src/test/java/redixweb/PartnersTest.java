@@ -38,4 +38,19 @@ public class PartnersTest {
         assertThat(element("partner.title")).hasText("Partner A");
         assertThat(element("partner.noMovements")).hasText(Words.of("ar", "capital.noMovements"));
     }
+
+    @Test(description = "New partner adds a partner, and one with no capital is deleted, asked first", testName = "c764702a-cfc1-48c1-9831-d495a69ea3ab", priority = 2)
+    public void newPartnerAddsAPartnerAndOneWithNoCapitalIsDeletedAskedFirst() {
+        final @NotNull Page page = onPartners(Ledger.withPartner("Partner A"));
+        element("partners.add").click();
+        element("partners.partnerName").fill("Partner B");
+        element("partner.save").click();
+        assertThat(element("partner.title")).hasText("Partner B");
+        final @NotNull Locator added = page.locator("[id^='partners.row.']").filter(new Locator.FilterOptions().setHasText("Partner B"));
+        assertThat(added).isVisible();
+        element("partners.delete").click();
+        element("partner.deleteConfirm").click();
+        assertThat(element("partner.title")).hasText(Words.of("ar", "partners.deleted"));
+        assertThat(added).hasCount(0);
+    }
 }
