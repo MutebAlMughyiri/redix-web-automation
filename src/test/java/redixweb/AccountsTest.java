@@ -86,4 +86,18 @@ public class AccountsTest {
         element("transfer.save").click();
         assertThat(element("transfer.refusal")).hasText(Words.of("ar", "transfers.insufficientBalance"));
     }
+
+    @Test(description = "Updating the actual balances keeps the count, and Accounts shows its total", testName = "db784129-4839-4483-b064-dc21898e6e4c", priority = 5)
+    public void updatingTheActualBalancesKeepsTheCountAndAccountsShowsItsTotal() {
+        final @NotNull Page page = onAccounts(Ledger.withEntries(List.of(100), List.of()));
+        element("accounts.update").click();
+        assertThat(element("reconcile.title")).hasText(Words.of("ar", "reconciliations.enterTitle"));
+        final @NotNull Locator bankField = page.locator("[id^='reconcile.balance.'][name]");
+        bankField.fill("-100");
+        bankField.press("Tab");
+        assertThat(element("reconcile.difference")).containsText("0.00");
+        element("reconcile.save").click();
+        assertThat(element("accounts.title")).isVisible();
+        assertThat(element("reconciliation.actualTotal")).hasText("(100.00)");
+    }
 }
