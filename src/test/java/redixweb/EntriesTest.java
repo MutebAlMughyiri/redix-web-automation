@@ -138,4 +138,17 @@ public class EntriesTest {
         assertThat(element("addEntry.message")).hasText(Words.of("ar", "expenses.sent"));
         assertThat(element("entry.amount")).hasText("350.00");
     }
+
+    @Test(description = "A contract payment shows the contract's value and what remains after it, and warns past the value", testName = "e5b8ddf3-8c2b-460b-974a-630253b626a7", priority = 9)
+    public void aContractPaymentShowsTheContractsValueAndWhatRemainsAfterItAndWarnsPastTheValue() {
+        onTheList(Ledger.withContract(1000));
+        element("entries.new").click();
+        element("addEntry.table").selectOption(new SelectOption().setLabel("Contractor (Excavation)"));
+        assertThat(element("addEntry.value")).hasText("1,000.00");
+        assertThat(element("addEntry.remaining")).hasText("1,000.00");
+        element("addEntry.amount").fill("1200");
+        element("addEntry.amount").press("Tab");
+        assertThat(element("addEntry.remaining")).hasText("(200.00)");
+        assertThat(element("addEntry.overrun")).hasText(Words.of("ar", "contractorPayments.overrun"));
+    }
 }
