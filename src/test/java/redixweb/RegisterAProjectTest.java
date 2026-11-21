@@ -6,10 +6,12 @@ package redixweb;
 import com.microsoft.playwright.Page;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
+import redix.support.Ledger;
 import redix.support.People;
 import redix.support.Web;
 import redix.support.Words;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
@@ -103,5 +105,24 @@ public class RegisterAProjectTest {
         assertThat(element("newProject.unit.1")).containsText("A2");
         assertThat(element("newProject.partner.0")).containsText("Partner A");
         assertThat(element("newProject.password")).hasValue("");
+    }
+
+    @Test(description = "Signed in, the project menu registers a project the person manages", testName = "a78f3037-9347-4ca3-974f-500e77a0fac4", priority = 5)
+    public void signedInTheProjectMenuRegistersAProjectThePersonManages() {
+        final @NotNull Ledger.Kept kept = Ledger.withEntries(List.of(), List.of());
+        Web.page();
+        Web.signIn(kept.manager().username(), People.PASSWORD);
+        element("projects.card." + kept.projectId()).click();
+        assertThat(element("home.title")).isVisible();
+        element("web.project").click();
+        element("projects.new").click();
+        assertThat(element("newProject.title")).hasText(Words.of("ar", "projects.new"));
+        assertThat(element("newProject.password")).hasCount(0);
+        final @NotNull String name = "Second " + newUsername();
+        element("newProject.name").fill(name);
+        added("newProject.unitName", "B1");
+        element("newProject.submit").click();
+        assertThat(element("newProject.notice")).containsText(name);
+        assertThat(element("web.projects")).containsText(name);
     }
 }
