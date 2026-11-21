@@ -67,4 +67,16 @@ public class ApprovalsTest {
         assertThat(element("entry.reason")).hasText(Words.of("ar", "approvals.reasonDuplicate"));
         assertThat(rows(page)).hasCount(0);
     }
+
+    @Test(description = "The approval history tells what was approved and by whom", testName = "1f1f6406-e92e-4745-bcf8-12bf71fedff2", priority = 4)
+    public void theApprovalHistoryTellsWhatWasApprovedAndByWhom() {
+        final @NotNull Ledger.Kept kept = Ledger.withEntries(List.of(100), List.of());
+        final @NotNull Page page = onApprovals(kept);
+        element("approvals.history").click();
+        assertThat(element("approvalHistory.title")).isVisible();
+        final @NotNull Locator lines = page.locator("[id^='approvalHistory.line.']");
+        assertThat(lines).hasCount(1);
+        assertThat(lines.first()).containsText("Excavation");
+        assertThat(lines.first()).containsText(kept.manager().displayName());
+    }
 }
