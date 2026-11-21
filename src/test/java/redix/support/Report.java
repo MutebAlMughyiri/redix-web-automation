@@ -57,6 +57,10 @@ public final class Report implements ISuiteListener, ITestListener {
 
     @Override
     public void onTestFailure(final @NotNull ITestResult result) {
+        if (Web.current().isClosed()) {
+            CURRENT.get().fail(result.getThrowable());
+            return;
+        }
         final @NotNull String screenshot = Base64.getEncoder().encodeToString(Web.current().screenshot());
         CURRENT.get().fail(result.getThrowable(), MediaEntityBuilder.createScreenCaptureFromBase64String(screenshot).build());
         Web.close();
