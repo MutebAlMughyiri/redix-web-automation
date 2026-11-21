@@ -24,7 +24,7 @@ import static redix.support.Web.element;
 
 public class WorkInTheShellTest {
     /** The side menu's items no feature has built yet, which stand gray (#161 R15). */
-    private static final @NotNull List<String> NOT_BUILT = List.of("home", "entries", "approvals", "accounts", "partners", "contracts", "reports", "history");
+    private static final @NotNull List<String> NOT_BUILT = List.of("entries", "approvals", "accounts", "partners", "contracts", "reports", "history");
 
     /** A page signed in as a new person, the shell as a first visit leaves it. */
     private static @NotNull Page signedIn() {
@@ -52,7 +52,7 @@ public class WorkInTheShellTest {
     @Test(description = "Settings opens in a tab, and the items not built stand gray", testName = "03cdbc0f-a1f7-4872-b54b-0d962f91913f", priority = 1)
     public void settingsOpensInATabAndTheItemsNotBuiltStandGray() {
         signedIn();
-        assertThat(element("web.pickFromMenu")).hasText(Words.of("ar", "web.pickFromMenu"));
+        assertThat(element("web.tab.home")).hasAttribute("aria-selected", "true");
         element("web.item.settings").click();
         assertThat(element("web.tab.settings")).hasAttribute("aria-selected", "true");
         assertThat(element("sharedSettings.title")).hasText(Words.of("ar", "sharedSettings.title"));
@@ -69,7 +69,10 @@ public class WorkInTheShellTest {
         assertThat(element("sharedSettings.title")).isVisible();
         element("web.tab.settings.close").click();
         assertThat(element("web.tab.settings")).hasCount(0);
-        assertThat(element("web.pickFromMenu")).isVisible();
+        assertThat(element("web.tab.home")).hasAttribute("aria-selected", "true");
+        element("web.tab.home.close").click();
+        assertThat(element("web.tab.home")).hasCount(0);
+        assertThat(element("web.pickFromMenu")).hasText(Words.of("ar", "web.pickFromMenu"));
         assertThat(element("web.item.settings")).hasAttribute("aria-current", "false");
     }
 
