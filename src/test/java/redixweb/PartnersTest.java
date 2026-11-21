@@ -53,4 +53,16 @@ public class PartnersTest {
         assertThat(element("partner.title")).hasText(Words.of("ar", "partners.deleted"));
         assertThat(added).hasCount(0);
     }
+
+    @Test(description = "The partner history tells a partner added from Partners", testName = "34a54463-dbdf-45d5-ba28-b5c9df491c0d", priority = 3)
+    public void thePartnerHistoryTellsAPartnerAddedFromPartners() {
+        final @NotNull Page page = onPartners(Ledger.withPartner("Partner A"));
+        element("partners.add").click();
+        element("partners.partnerName").fill("Partner B");
+        element("partner.save").click();
+        assertThat(element("partner.title")).hasText("Partner B");
+        element("partners.history").click();
+        assertThat(element("partnerHistory.title")).isVisible();
+        assertThat(page.locator("[id^='partnerHistory.line.']").filter(new Locator.FilterOptions().setHasText("Partner B")).first()).isVisible();
+    }
 }
