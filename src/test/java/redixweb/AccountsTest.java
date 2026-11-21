@@ -5,6 +5,7 @@ package redixweb;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.SelectOption;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 import redix.support.Ledger;
@@ -53,5 +54,21 @@ public class AccountsTest {
         assertThat(bank(page)).hasClass(Pattern.compile("disabled"));
         element("accounts.enable").click();
         assertThat(bank(page)).not().hasClass(Pattern.compile("disabled"));
+    }
+
+    @Test(description = "New account adds a cash custody held by the manager, under the custodies", testName = "9c0dd5fd-1add-4130-87eb-fa29cb1e262f", priority = 3)
+    public void newAccountAddsACashCustodyHeldByTheManagerUnderTheCustodies() {
+        final @NotNull Ledger.Kept kept = Ledger.withEntries(List.of(), List.of());
+        final @NotNull Page page = onAccounts(kept);
+        element("accounts.add").click();
+        element("accounts.accountName").fill("Site cash");
+        element("accounts.type.cashCustody").click();
+        element("account.save").click();
+        assertThat(element("account.refusal")).hasText(Words.of("ar", "accounts.custodianRequired"));
+        element("accounts.custodian").selectOption(new SelectOption().setLabel(kept.manager().displayName()));
+        element("account.save").click();
+        assertThat(element("account.title")).hasText("Site cash");
+        assertThat(element("accounts.group.cashCustody")).hasText(Words.of("ar", "accounts.custodies"));
+        assertThat(page.locator("[id^='accounts.row.']").filter(new Locator.FilterOptions().setHasText("Site cash"))).isVisible();
     }
 }
