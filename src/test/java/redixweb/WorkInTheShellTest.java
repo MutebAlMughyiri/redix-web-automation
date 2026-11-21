@@ -129,10 +129,10 @@ public class WorkInTheShellTest {
     public void aReloadKeepsTheBarsTheSideMenuItsWidthAndTheOpenTab() {
         final @NotNull Page page = signedIn();
         element("web.item.settings").click();
-        dragTheLine(page, 52);
+        page.waitForResponse(saved -> saved.url().endsWith("/view"), () -> dragTheLine(page, 52));
         final int width = sideMenuWidth();
         element("web.view").click();
-        element("web.view.statusBar").click();
+        page.waitForResponse(saved -> saved.url().endsWith("/view"), () -> element("web.view.statusBar").click());
         page.keyboard().press("Escape");
         page.reload();
         assertThat(element("web.statusBar")).isHidden();

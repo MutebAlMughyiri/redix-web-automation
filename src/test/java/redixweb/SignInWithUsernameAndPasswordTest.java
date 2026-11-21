@@ -44,6 +44,7 @@ public class SignInWithUsernameAndPasswordTest {
         element("signIn.submit").click();
         assertThat(element("signIn.message")).hasText(Words.of("ar", "signIn.invalidCredentials"));
         assertThat(element("signIn.username")).hasValue(person.username());
+        assertThat(element("signIn.password")).isFocused();
         assertThat(element("web.sideMenu")).hasCount(0);
     }
 
@@ -56,7 +57,7 @@ public class SignInWithUsernameAndPasswordTest {
             element("signIn.password").fill("Wrong-passw0rd-1");
             page.waitForResponse(answer -> answer.url().endsWith("/sign-in"), () -> element("signIn.submit").click());
             assertThat(element("signIn.message")).isVisible();
-            assertThat(element("signIn.username")).isFocused();
+            assertThat(element("signIn.password")).isFocused();
         }
         element("signIn.password").fill(People.PASSWORD);
         element("signIn.submit").click();
