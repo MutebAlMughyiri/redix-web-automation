@@ -5,6 +5,7 @@ package redixweb;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.SelectOption;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 import redix.support.Ledger;
@@ -90,5 +91,37 @@ public class EntriesTest {
         assertThat(element("entry.status")).hasText(Words.of("ar", "entries.approved"));
         assertThat(element("entries.row." + kept.entryIds().get(1))).containsText(Words.of("ar", "entries.approved"));
         assertThat(element("entry.approve")).hasCount(0);
+    }
+
+    /** Add entry opened from the Entries tab of kept's project, its Excavation table chosen and drawn again for it. */
+    private static void addingToExcavation(final @NotNull Ledger.Kept kept) {
+        onTheList(kept);
+        element("entries.new").click();
+        assertThat(element("addEntry.title")).isVisible();
+        element("addEntry.table").selectOption(new SelectOption().setLabel("Excavation"));
+        assertThat(element("addEntry.table").locator("option[selected]")).hasText("Excavation");
+    }
+
+    @Test(description = "Add entry sends a purchase for approval, and the new entry shows in the panel", testName = "883bacdf-d1ee-4e83-a84b-99e3475d97ae", priority = 6)
+    public void addEntrySendsAPurchaseForApprovalAndTheNewEntryShowsInThePanel() {
+        addingToExcavation(Ledger.withEntries(List.of(), List.of()));
+        element("addEntry.description").fill("Web payment");
+        element("addEntry.amount").fill("1,500");
+        element("addEntry.send").click();
+        assertThat(element("addEntry.message")).hasText(Words.of("ar", "expenses.sent"));
+        assertThat(element("entry.status")).hasText(Words.of("ar", "entries.pendingApproval"));
+        assertThat(element("entry.amount")).hasText("1,500.00");
+        assertThat(element("addEntry.description")).hasValue("");
+    }
+
+    @Test(description = "Add entry says why an amount that is no number cannot be saved, and keeps what was typed", testName = "584cf050-39d9-464a-932a-373858b7bc75", priority = 7)
+    public void addEntrySaysWhyAnAmountThatIsNoNumberCannotBeSavedAndKeepsWhatWasTyped() {
+        addingToExcavation(Ledger.withEntries(List.of(), List.of()));
+        element("addEntry.description").fill("Web payment");
+        element("addEntry.amount").fill("abc");
+        element("addEntry.send").click();
+        assertThat(element("addEntry.message")).hasText(Words.of("ar", "expenses.invalidAmount"));
+        assertThat(element("addEntry.description")).hasValue("Web payment");
+        assertThat(element("entry.amount")).hasCount(0);
     }
 }
