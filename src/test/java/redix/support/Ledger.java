@@ -31,12 +31,12 @@ public final class Ledger {
                            @NotNull String table, @NotNull String account, @NotNull String method) {
     }
 
-    /** A new manager's project, registered and approved, with a bank account and a purchases item, Excavation, as the app records them. */
-    private static @NotNull Started started() {
+    /** A new manager's project, registered with partners and approved, with a bank account and a purchases item, Excavation, as the app records them. */
+    private static @NotNull Started started(final @NotNull List<String> partners) {
         final @NotNull String tag = String.valueOf(ThreadLocalRandom.current().nextInt(10_000_000, 99_999_999));
         final @NotNull People.Person manager = new People.Person("manager" + tag, "Manager " + tag);
         final @NotNull String projectId = given(Api.anonymous()).body(Map.of("name", "Project " + tag, "startDate", LocalDate.now().minusDays(30).toString(), "units", List.of("A1"),
-                        "partners", List.of(), "description", "", "displayName", manager.displayName(), "username", manager.username(), "mobile", "05" + tag,
+                        "partners", partners, "description", "", "displayName", manager.displayName(), "username", manager.username(), "mobile", "05" + tag,
                         "password", People.PASSWORD))
                 .post("/projects/register").then().statusCode(201).extract().path("id");
         given(Api.asAdmin()).post("/projects/" + projectId + "/approve").then().statusCode(200);
@@ -57,7 +57,7 @@ public final class Ledger {
 
     /** A new manager's approved project with approved entries of the amounts approved, then entries of the amounts waiting, sent for approval. */
     public static @NotNull Kept withEntries(final @NotNull List<Integer> approved, final @NotNull List<Integer> waiting) {
-        final @NotNull Started project = started();
+        final @NotNull Started project = started(List.of());
         final @NotNull List<String> ids = new ArrayList<>();
         final @NotNull List<Integer> amounts = new ArrayList<>(approved);
         amounts.addAll(waiting);
@@ -76,12 +76,18 @@ public final class Ledger {
 
     /** A new manager's approved project whose Excavation item takes contracts, with one of value to Contractor, and no entries. */
     public static @NotNull Kept withContract(final int value) {
-        final @NotNull Started project = started();
+        final @NotNull Started project = started(List.of());
         given(Api.as(project.token())).body(Map.of("type", "both")).put(project.path() + "/items/" + project.item() + "/type").then().statusCode(200);
         final @NotNull String supplier = given(Api.as(project.token())).body(Map.of("name", "Contractor")).post(project.path() + "/suppliers").then().statusCode(201)
                 .extract().path("id");
         given(Api.as(project.token())).body(Map.of("supplierId", supplier, "itemId", project.item(), "value", value, "isOpenValue", false))
                 .post(project.path() + "/contracts").then().statusCode(200);
+        return new Kept(project.manager(), project.projectId(), List.of());
+    }
+
+    /** A new manager's approved project registered with the partner partner, who has put nothing in yet. */
+    public static @NotNull Kept withPartner(final @NotNull String partner) {
+        final @NotNull Started project = started(List.of(partner));
         return new Kept(project.manager(), project.projectId(), List.of());
     }
 }
