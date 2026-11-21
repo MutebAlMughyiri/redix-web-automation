@@ -79,4 +79,16 @@ public class EntriesTest {
         assertThat(rows(page)).hasCount(1);
         assertThat(element("entries.row." + kept.entryIds().get(1))).isVisible();
     }
+
+    @Test(description = "The manager approves a waiting entry from the panel, and its row follows", testName = "018988e4-a613-491b-bb5a-5edae4905477", priority = 5)
+    public void theManagerApprovesAWaitingEntryFromThePanelAndItsRowFollows() {
+        final @NotNull Ledger.Kept kept = Ledger.withEntries(List.of(100), List.of(300));
+        onTheList(kept);
+        element("entries.row." + kept.entryIds().get(1)).click();
+        assertThat(element("entry.status")).hasText(Words.of("ar", "entries.pendingApproval"));
+        element("entry.approve").click();
+        assertThat(element("entry.status")).hasText(Words.of("ar", "entries.approved"));
+        assertThat(element("entries.row." + kept.entryIds().get(1))).containsText(Words.of("ar", "entries.approved"));
+        assertThat(element("entry.approve")).hasCount(0);
+    }
 }
