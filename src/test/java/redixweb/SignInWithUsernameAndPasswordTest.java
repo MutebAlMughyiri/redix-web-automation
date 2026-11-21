@@ -65,8 +65,8 @@ public class SignInWithUsernameAndPasswordTest {
         assertThat(element("web.sideMenu")).hasCount(0);
     }
 
-    @Test(description = "The sign-in form has what the app's has, its parked links gray", testName = "47149d0a-ff76-45cc-a6c3-a65c1c152b01", priority = 4)
-    public void theSignInFormHasWhatTheAppsHasItsParkedLinksGray() {
+    @Test(description = "The sign-in form has what the app's has, Register new project gray and Forgot your password a link", testName = "47149d0a-ff76-45cc-a6c3-a65c1c152b01", priority = 4)
+    public void theSignInFormHasWhatTheAppsHasRegisterGrayAndForgotPasswordALink() {
         Web.page();
         for (final @NotNull String id : List.of("signIn.title", "signIn.hint", "signIn.username", "signIn.password", "signIn.submit", "myAccount.arabic",
                 "myAccount.english")) {
@@ -74,7 +74,7 @@ public class SignInWithUsernameAndPasswordTest {
         }
         assertThat(element("signIn.message")).isHidden();
         assertThat(element("signIn.registerProject")).hasAttribute("aria-disabled", "true");
-        assertThat(element("auth.forgotPassword")).hasAttribute("aria-disabled", "true");
+        assertThat(element("auth.forgotPassword")).hasAttribute("hx-get", "/forgot-password");
         assertThat(element("appVersion.line")).hasText(Pattern.compile(Words.of("ar", "app.version") + " \\d+\\.\\d+\\.\\d+"));
         assertThat(element("web.sideMenu")).hasCount(0);
     }
