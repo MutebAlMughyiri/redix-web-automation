@@ -70,6 +70,23 @@ public final class Web {
     }
 
     /**
+     * Opens the side menu's item called name, opening More first when the item is folded under it and More is closed (redix-api findings row 307).
+     */
+    public static void openItem(final @NotNull String name) {
+        final @NotNull Locator more = element("web.more");
+        if (more.getByTestId("web.item." + name).count() > 0 && more.getAttribute("open") == null) {
+            element("web.more.toggle").click();
+        }
+        element("web.item." + name).click();
+    }
+
+    /** Opens My account in the status bar and chooses the item whose id is id: My history, Shared settings or Sign out (redix-api findings row 306). */
+    public static void openAccount(final @NotNull String id) {
+        element("web.account").click();
+        element(id).click();
+    }
+
+    /**
      * Waits until the side menu has finished moving: folded to nothing, or open to the width the shell holds. The shell moves it over 260 ms, on
      * signing in, folding and unfolding, so a case measuring it waits for the move to end.
      */

@@ -24,7 +24,7 @@ public class PermissionRequestsTest {
         Web.signIn(kept.manager().username(), People.PASSWORD);
         element("projects.card." + kept.projectId()).click();
         assertThat(element("home.title")).isVisible();
-        element("web.item.myPermissions").click();
+        Web.openItem("myPermissions");
         assertThat(element("myPermissions.title")).isVisible();
         return page;
     }
@@ -58,18 +58,18 @@ public class PermissionRequestsTest {
     public void aRequestRejectedWithItsReasonIsSaidRejectedOneApprovedChangesThePermissions() {
         final @NotNull Page page = onMyPermissions(Ledger.withEntries(List.of(), List.of()));
         askToGiveUpGeneratingReports("Reports are someone else's");
-        element("web.item.requests").click();
+        Web.openItem("requests");
         page.locator("[id^='permissionRequests.reject.']").click();
         element("permissionRequests.rejectReason").fill("Keep them for now");
         element("permissionRequests.rejectSend").click();
         assertThat(element("permissionRequests.empty")).isVisible();
-        element("web.item.myPermissions").click();
+        Web.openItem("myPermissions");
         assertThat(element("myPermissions.request")).containsText("Keep them for now");
         askToGiveUpGeneratingReports("Reports are someone else's");
-        element("web.item.requests").click();
+        Web.openItem("requests");
         page.locator("[id^='permissionRequests.approve.']").click();
         assertThat(element("permissionRequests.empty")).isVisible();
-        element("web.item.myPermissions").click();
+        Web.openItem("myPermissions");
         assertThat(element("myPermissions.generateReports.input")).not().isChecked();
     }
 }

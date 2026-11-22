@@ -5,8 +5,9 @@ package redixweb;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import com.microsoft.playwright.assertions.LocatorAssertions;
+import com.microsoft.playwright.options.BoundingBox;
 import org.jetbrains.annotations.NotNull;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import redix.support.People;
 import redix.support.People.Person;
@@ -18,12 +19,9 @@ import static redix.support.Web.element;
 
 /**
  * Projects and the home on the web (redix-api #165, UC-049). A new person is in one project with no default and no entries, and holds no approval,
- * so these cases prove the list, the choice, the summary's shape and its folding; the figures with entries are proved by the API's Go tests.
+ * so these cases prove the list, the choice and the summary's shape; the figures with entries are proved by the API's Go tests.
  */
 public class ProjectsAndTheHomeTest {
-    /** Reads a label as the person sees it: Hide details holds both its words, and shows one. */
-    private static final @NotNull LocatorAssertions.HasTextOptions SEEN = new LocatorAssertions.HasTextOptions().setUseInnerText(true);
-
     /** A page signed in as a new person, on the project list a first visit lands on. */
     private static @NotNull Page onTheList() {
         final @NotNull Person person = People.signedUp();
@@ -58,10 +56,12 @@ public class ProjectsAndTheHomeTest {
         assertThat(element("web.tab.home")).hasAttribute("aria-selected", "true");
     }
 
-    @Test(description = "An empty project says it has no entries, and Add entry stands gray", testName = "450b3eed-31a2-480d-8962-ce60d2d6c63a", priority = 2)
-    public void anEmptyProjectSaysItHasNoEntriesAndAddEntryStandsGray() {
-        final @NotNull String id = atHome(onTheList());
-        assertThat(element("home.entriesEmpty." + id)).hasText(Words.of("ar", "entries.empty"));
+    @Test(description = "The home lists no entries, and Add entry stands gray for whoever may not enter them", testName = "450b3eed-31a2-480d-8962-ce60d2d6c63a",
+            priority = 2)
+    public void theHomeListsNoEntriesAndAddEntryStandsGrayForWhoeverMayNotEnterThem() {
+        final @NotNull Page page = onTheList();
+        final @NotNull String id = atHome(page);
+        assertThat(page.locator("[id^='entries.row.'], [id^='home.entriesEmpty.']")).hasCount(0);
         assertThat(element("home.addEntry." + id)).isDisabled();
         assertThat(element("summary.surplus")).containsText("0.00");
         assertThat(element("summary.pending")).hasCount(0);
@@ -77,17 +77,26 @@ public class ProjectsAndTheHomeTest {
         assertThat(element("summary.revenue.card")).not().hasAttribute("open", "");
     }
 
-    @Test(description = "Hide details folds the summary, and a reload keeps it folded", testName = "9a7484ac-812b-4fd8-9c44-32a075f836fc", priority = 4)
-    public void hideDetailsFoldsTheSummaryAndAReloadKeepsItFolded() {
+    @Test(description = "The home shows the summary always, with no Hide details", testName = "9a7484ac-812b-4fd8-9c44-32a075f836fc", priority = 4)
+    public void theHomeShowsTheSummaryAlwaysWithNoHideDetails() {
         final @NotNull Page page = onTheList();
         atHome(page);
-        final @NotNull Page.WaitForResponseOptions kept = new Page.WaitForResponseOptions();
-        page.waitForResponse(response -> response.url().endsWith("/view"), kept, () -> element("home.collapse").click());
-        assertThat(element("summary.card")).isHidden();
-        assertThat(element("home.collapse")).hasText(Words.of("ar", "home.showDetails"), SEEN);
+        assertThat(element("summary.card")).isVisible();
+        assertThat(element("home.collapse")).hasCount(0);
         page.reload();
-        assertThat(element("summary.card")).isHidden();
-        assertThat(element("home.collapse")).hasText(Words.of("ar", "home.showDetails"), SEEN);
+        assertThat(element("summary.card")).isVisible();
+    }
+
+    @Test(description = "A tab's buttons stand at its head's far end, away from its title", testName = "03e67e78-2aa2-48e3-a17f-21ba8d4a7625", priority = 6)
+    public void aTabsButtonsStandAtItsHeadsFarEndAwayFromItsTitle() {
+        final @NotNull Page page = onTheList();
+        atHome(page);
+        element("web.item.entries").click();
+        assertThat(element("entries.title")).isVisible();
+        final @NotNull BoundingBox title = element("entries.title").boundingBox(), actions = element("entries.actions").boundingBox(),
+                content = element("web.content").boundingBox();
+        Assert.assertTrue(actions.x + actions.width < title.x, "in Arabic the buttons stand left of the title");
+        Assert.assertTrue(actions.x - content.x < 40, "at the head's far end: " + (actions.x - content.x));
     }
 
     @Test(description = "The project button lists my projects and opens one's home", testName = "6755d992-2ec1-4db7-9217-b7a0515070be", priority = 5)

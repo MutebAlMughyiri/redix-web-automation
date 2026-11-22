@@ -42,7 +42,7 @@ public class HistoryTest {
     @Test(description = "My history, from the top bar, lists my signing in", testName = "7f48c39b-09af-4d0e-b148-89c69a4f39d9", priority = 2)
     public void myHistoryFromTheTopBarListsMySigningIn() {
         final @NotNull Page page = onProject(Ledger.withEntries(List.of(), List.of()));
-        element("web.myHistory").click();
+        Web.openAccount("web.myHistory");
         assertThat(element("myHistory.title")).hasText(Words.of("ar", "history.myTitle"));
         assertThat(page.locator("[id^='myHistory.line.']").filter(new Locator.FilterOptions().setHasText(Words.of("ar", "history.login.signIn"))).first()).isVisible();
     }

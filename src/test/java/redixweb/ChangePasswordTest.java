@@ -42,7 +42,7 @@ public class ChangePasswordTest {
         assertThat(element("changePassword.title")).hasText(Words.of("ar", "changePassword.title"));
         assertThat(element("changePassword.current")).isFocused();
         assertThat(element("web.sideMenu")).hasCount(0);
-        assertThat(element("myAccount.signOut")).isVisible();
+        assertThat(element("web.account")).isVisible();
     }
 
     @Test(description = "Two new passwords that differ are refused", testName = "cc1d471e-4bff-4e1a-834c-48f8fcb02bc3", priority = 2)

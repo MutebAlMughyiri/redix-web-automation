@@ -25,7 +25,7 @@ public class ProjectInfoTest {
         Web.signIn(kept.manager().username(), People.PASSWORD);
         element("projects.card." + kept.projectId()).click();
         assertThat(element("home.title")).isVisible();
-        element("web.item.projectInfo").click();
+        Web.openItem("projectInfo");
         assertThat(element("projectInfo.title")).isVisible();
         return page;
     }

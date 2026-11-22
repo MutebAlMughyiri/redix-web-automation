@@ -26,7 +26,7 @@ public class StructureTest {
         Web.signIn(kept.manager().username(), People.PASSWORD);
         element("projects.card." + kept.projectId()).click();
         assertThat(element("home.title")).isVisible();
-        element("web.item.categories").click();
+        Web.openItem("categories");
         assertThat(element("categories.title")).isVisible();
         return page;
     }
@@ -78,11 +78,11 @@ public class StructureTest {
         page.keyboard().press("Alt+ArrowDown");
         assertThat(page.locator("tr[id^='categories.item.']").filter(new Locator.FilterOptions().setHasText("Tiles")).locator("xpath=following-sibling::tr[1]"))
                 .containsText("Paint");
-        element("web.item.categories").click();
+        Web.openItem("categories");
         assertThat(itemRow(page, "Tiles").locator("xpath=following-sibling::tr[1]")).containsText("Paint");
         itemRow(page, "Paint").dragTo(itemRow(page, "Tiles"), new Locator.DragToOptions().setTargetPosition(10, 2));
         assertThat(itemRow(page, "Paint").locator("xpath=following-sibling::tr[1]")).containsText("Tiles");
-        element("web.item.categories").click();
+        Web.openItem("categories");
         assertThat(itemRow(page, "Paint").locator("xpath=following-sibling::tr[1]")).containsText("Tiles");
     }
 

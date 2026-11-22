@@ -25,7 +25,7 @@ public class PaymentMethodsTest {
         Web.signIn(kept.manager().username(), People.PASSWORD);
         element("projects.card." + kept.projectId()).click();
         assertThat(element("home.title")).isVisible();
-        element("web.item.paymentMethods").click();
+        Web.openItem("paymentMethods");
         assertThat(element("paymentMethods.title")).isVisible();
         return page;
     }

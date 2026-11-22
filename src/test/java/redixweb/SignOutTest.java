@@ -20,7 +20,7 @@ public class SignOutTest {
         final @NotNull Person person = People.signedUp();
         final @NotNull Page page = Web.page();
         Web.signIn(person.username(), People.PASSWORD);
-        element("myAccount.signOut").click();
+        Web.openAccount("myAccount.signOut");
         assertThat(element("signIn.username")).isVisible();
         assertThat(element("signIn.message")).isHidden();
         assertThat(element("web.sideMenu")).hasCount(0);

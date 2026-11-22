@@ -45,7 +45,7 @@ public class ProjectFilesTest {
             priority = 1)
     public void loadFileListsEveryRowAProjectFileWasRefusedForAndLoadsOneItTakes() {
         onHome(Ledger.withEntries(List.of(), List.of()));
-        element("web.item.loadFile").click();
+        Web.openItem("loadFile");
         assertThat(element("loadFile.what")).hasText(Words.of("ar", "projects.loadFileWhat"));
         element("loadFile.file").setInputFiles(projectFile("No such account"));
         element("loadFile.load").click();
@@ -60,11 +60,11 @@ public class ProjectFilesTest {
             priority = 2)
     public void archiveHandsTheProjectsFileOverAndRetrievePreviewsItThenRetrievesIt() throws Exception {
         final @NotNull Page page = onHome(Ledger.withEntries(List.of(100), List.of()));
-        final @NotNull Download archive = page.waitForDownload(() -> element("web.item.archive").click());
+        final @NotNull Download archive = page.waitForDownload(() -> Web.openItem("archive"));
         Assert.assertTrue(archive.suggestedFilename().endsWith(".json"), archive.suggestedFilename());
         final @NotNull Path kept = Files.createTempFile("archive", ".json");
         archive.saveAs(kept);
-        element("web.item.retrieve").click();
+        Web.openItem("retrieve");
         element("retrieve.file").setInputFiles(kept);
         assertThat(element("retrieve.takenBy")).isVisible();
         assertThat(element("retrieve.part.entries")).containsText(Words.of("ar", "projects.retrieve.part.entries"));
