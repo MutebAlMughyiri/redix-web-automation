@@ -99,18 +99,18 @@ public class WorkInTheShellTest {
         Web.sideMenuSettled(false);
     }
 
-    @Test(description = "The View menu hides the top bar, and the status bar, which holds My account, stays", testName = "31603eea-62cd-4ae3-90a5-5369f9dd6a6a",
-            priority = 5)
-    public void theViewMenuHidesTheTopBarAndTheStatusBarWhichHoldsMyAccountStays() {
+    @Test(description = "The View menu hides the top bar and the status bar, My account with it", testName = "31603eea-62cd-4ae3-90a5-5369f9dd6a6a", priority = 5)
+    public void theViewMenuHidesTheTopBarAndTheStatusBarMyAccountWithIt() {
         signedIn();
         element("web.view").click();
         assertThat(element("web.viewMenu")).isVisible();
-        assertThat(element("web.view.statusBar")).hasCount(0);
         assertThat(element("web.view")).hasAttribute("aria-label", Words.of("ar", "web.view"));
         assertThat(element("web.view.arrow")).isVisible();
         element("web.view.topBar").click();
+        element("web.view.statusBar").click();
         assertThat(element("web.topBar")).isHidden();
-        assertThat(element("web.statusBar")).isVisible();
+        assertThat(element("web.statusBar")).isHidden();
+        assertThat(element("web.account")).isHidden();
         element("web.view.topBar").click();
         assertThat(element("web.topBar")).isVisible();
     }
@@ -208,6 +208,7 @@ public class WorkInTheShellTest {
         final @NotNull Page page = signedIn();
         Web.openAccount("web.sharedSettings");
         assertThat(element("web.tab.settings")).hasAttribute("aria-selected", "true");
+        assertThat(element("web.tab.settings.close")).hasAttribute("data-tip", Words.of("ar", "web.close") + " \u2068(Alt+W)\u2069");
         page.keyboard().press("Alt+KeyW");
         assertThat(element("web.tab.settings")).hasCount(0);
         assertThat(element("web.tab.home")).hasAttribute("aria-selected", "true");
