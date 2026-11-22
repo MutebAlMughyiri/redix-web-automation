@@ -24,7 +24,7 @@ import static redix.support.Web.element;
 
 public class WorkInTheShellTest {
     /** The side menu's items no feature has built yet, which stand gray (#161 R15). */
-    private static final @NotNull List<String> NOT_BUILT = List.of("reports", "history");
+    private static final @NotNull List<String> NOT_BUILT = List.of("history");
 
     /** A page signed in as a new person, the shell as a first visit leaves it. */
     private static @NotNull Page signedIn() {
