@@ -106,6 +106,8 @@ public class WorkInTheShellTest {
         element("web.view").click();
         assertThat(element("web.viewMenu")).isVisible();
         assertThat(element("web.view.statusBar")).hasCount(0);
+        assertThat(element("web.view")).hasAttribute("aria-label", Words.of("ar", "web.view"));
+        assertThat(element("web.view.arrow")).isVisible();
         element("web.view.topBar").click();
         assertThat(element("web.topBar")).isHidden();
         assertThat(element("web.statusBar")).isVisible();
