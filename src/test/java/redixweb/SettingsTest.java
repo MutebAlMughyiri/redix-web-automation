@@ -24,11 +24,11 @@ public class SettingsTest {
         final @NotNull Ledger.Kept kept = Ledger.withEntries(List.of(), List.of());
         final @NotNull Page page = Web.page();
         Web.signIn(kept.manager().username(), People.PASSWORD);
-        Web.openAccount("web.sharedSettings");
+        Web.openSettings();
         assertThat(element("sharedSettings.theme.system")).hasAttribute("aria-current", "true");
         element("sharedSettings.theme.dark").click();
         assertThat(page.locator("html")).hasAttribute("data-theme", "dark");
-        Web.openAccount("web.sharedSettings");
+        Web.openSettings();
         assertThat(element("sharedSettings.theme.dark")).hasAttribute("aria-current", "true");
         assertThat(element("sharedSettings.entriesShown")).hasCount(0);
         element("sharedSettings.theme.system").click();
@@ -41,7 +41,7 @@ public class SettingsTest {
         final @NotNull Ledger.Kept kept = Ledger.withEntries(List.of(), List.of());
         Web.page();
         Web.signIn(kept.manager().username(), People.PASSWORD);
-        Web.openAccount("web.sharedSettings");
+        Web.openSettings();
         element("sharedSettings.changeEmail").click();
         assertThat(element("myEmail.email")).isFocused();
         final @NotNull String address = "new-" + kept.manager().username() + "@redix.test";

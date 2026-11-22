@@ -30,7 +30,7 @@ public class SignInWithUsernameAndPasswordTest {
         Web.signIn(person.username(), People.PASSWORD);
         assertThat(element("web.shell")).hasClass(Pattern.compile("\\barriving\\b"));
         assertThat(element("web.tabs")).isVisible();
-        assertThat(element("web.account")).hasText(person.displayName());
+        assertThat(element("web.account.name")).hasText(person.displayName());
         assertThat(element("signIn.username")).hasCount(0);
     }
 
@@ -124,7 +124,7 @@ public class SignInWithUsernameAndPasswordTest {
         Web.signIn(person.username(), People.PASSWORD);
         page.reload();
         assertThat(element("web.sideMenu")).isVisible();
-        assertThat(element("web.account")).hasText(person.displayName());
+        assertThat(element("web.account.name")).hasText(person.displayName());
         assertThat(element("signIn.username")).hasCount(0);
         assertThat(element("web.shell")).not().hasClass(Pattern.compile("\\barriving\\b"));
     }

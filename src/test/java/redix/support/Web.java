@@ -80,7 +80,14 @@ public final class Web {
         element("web.item." + name).click();
     }
 
-    /** Opens My account in the status bar and chooses the item whose id is id: My history, Shared settings or Sign out (redix-api findings row 306). */
+    /** Opens My account in the status bar and hovers Settings, so its list stands open beside the menu (redix-api findings row 321). */
+    public static void openSettings() {
+        element("web.account").click();
+        element("web.sharedSettings").hover();
+        assertThat(element("web.settingsMenu")).isVisible();
+    }
+
+    /** Opens My account in the status bar and chooses the item whose id is id: My history or Sign out (redix-api findings row 306). */
     public static void openAccount(final @NotNull String id) {
         element("web.account").click();
         element(id).click();

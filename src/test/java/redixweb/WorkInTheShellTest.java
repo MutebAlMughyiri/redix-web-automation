@@ -45,14 +45,14 @@ public class WorkInTheShellTest {
         page.mouse().up();
     }
 
-    @Test(description = "Settings opens in a tab from My account, and no side-menu item stands gray but VAT refund", testName = "03cdbc0f-a1f7-4872-b54b-0d962f91913f",
+    @Test(description = "Settings opens as a list beside My account, with no tab, and no side-menu item stands gray but VAT refund", testName = "03cdbc0f-a1f7-4872-b54b-0d962f91913f",
             priority = 1)
     public void settingsOpensInATabFromMyAccountAndNoSideMenuItemStandsGray() {
         final @NotNull Page page = signedIn();
         assertThat(element("web.tab.home")).hasAttribute("aria-selected", "true");
-        Web.openAccount("web.sharedSettings");
-        assertThat(element("web.tab.settings")).hasAttribute("aria-selected", "true");
-        assertThat(element("sharedSettings.title")).hasText(Words.of("ar", "sharedSettings.title"));
+        Web.openSettings();
+        assertThat(element("sharedSettings.version")).isVisible();
+        assertThat(element("web.tab.settings")).hasCount(0);
         assertThat(element("web.item.settings")).hasCount(0);
         assertThat(page.locator("#web\\.tree [aria-disabled='true']:not([id='web.item.vat'])")).hasCount(0);
         assertThat(element("web.item.documents")).hasAttribute("hx-get", "/tab/documents");
@@ -61,10 +61,10 @@ public class WorkInTheShellTest {
     @Test(description = "Closing the last tab asks to pick from the side menu", testName = "90259f56-671c-4054-88f6-cfddafcefd62", priority = 2)
     public void closingTheLastTabAsksToPickFromTheSideMenu() {
         signedIn();
-        Web.openAccount("web.sharedSettings");
-        assertThat(element("sharedSettings.title")).isVisible();
-        element("web.tab.settings.close").click();
-        assertThat(element("web.tab.settings")).hasCount(0);
+        Web.openAccount("web.myHistory");
+        assertThat(element("myHistory.title")).isVisible();
+        element("web.tab.myHistory.close").click();
+        assertThat(element("web.tab.myHistory")).hasCount(0);
         assertThat(element("web.tab.home")).hasAttribute("aria-selected", "true");
         element("web.tab.home.close").click();
         assertThat(element("web.tab.home")).hasCount(0);
@@ -130,7 +130,7 @@ public class WorkInTheShellTest {
     @Test(description = "A reload keeps the top bar, the side menu, its width and the open tab", testName = "7da7c1ee-7523-4db9-82dd-846d0dfef39c", priority = 7)
     public void aReloadKeepsTheTopBarTheSideMenuItsWidthAndTheOpenTab() {
         final @NotNull Page page = signedIn();
-        Web.openAccount("web.sharedSettings");
+        Web.openAccount("web.myHistory");
         page.waitForResponse(saved -> saved.url().endsWith("/view"), () -> dragTheLine(page, 52));
         final int width = sideMenuWidth();
         element("web.view").click();
@@ -139,28 +139,28 @@ public class WorkInTheShellTest {
         page.reload();
         assertThat(element("web.topBar")).isHidden();
         assertThat(element("web.statusBar")).isVisible();
-        assertThat(element("web.tab.settings")).hasAttribute("aria-selected", "true");
-        assertThat(element("sharedSettings.title")).isVisible();
+        assertThat(element("web.tab.myHistory")).hasAttribute("aria-selected", "true");
+        assertThat(element("myHistory.title")).isVisible();
         assertTrue(Math.abs(sideMenuWidth() - width) <= 1, "the width is kept: " + sideMenuWidth() + " for " + width);
     }
 
-    @Test(description = "The language is chosen in Settings, not in the top bar", testName = "adc698ce-41cb-4b89-8c89-6a4d51b0a772", priority = 8)
+    @Test(description = "The language is chosen in Settings' list, not in the top bar", testName = "adc698ce-41cb-4b89-8c89-6a4d51b0a772", priority = 8)
     public void theLanguageIsChosenInSettingsNotInTheTopBar() {
         final @NotNull Page page = signedIn();
         final @NotNull Locator topBar = element("web.topBar");
         assertThat(topBar.locator("a[href^='/language/']")).hasCount(0);
-        Web.openAccount("web.sharedSettings");
+        Web.openSettings();
         assertThat(element("myAccount.language")).hasText(Words.of("ar", "myAccount.language"));
         element("myAccount.english").click();
         assertThat(page.locator("html")).hasAttribute("dir", "ltr");
-        assertThat(element("sharedSettings.title")).hasText(Words.of("en", "sharedSettings.title"));
+        assertThat(element("web.sharedSettings")).containsText(Words.of("en", "sharedSettings.title"));
         assertThat(element("web.fold")).hasText("«");
     }
 
     @Test(description = "The page never scrolls", testName = "fff489e1-517b-4d6b-a81e-f8792ce3e9b5", priority = 9)
     public void thePageNeverScrolls() {
         final @NotNull Page page = signedIn();
-        Web.openAccount("web.sharedSettings");
+        Web.openAccount("web.myHistory");
         assertFalse((Boolean) page.evaluate("() => document.documentElement.scrollHeight > innerHeight || document.documentElement.scrollWidth > innerWidth"),
                 "at a laptop's width");
         page.setViewportSize(390, 760);
@@ -181,7 +181,7 @@ public class WorkInTheShellTest {
         assertTrue(menu.y + menu.height <= account.y + 1 && Math.abs(menu.x - account.x) < 200, "My account opens above the person's name: " + menu.y + " for " + account.y);
         assertThat(element("web.accountMenu.name")).hasText(element("web.account.name").textContent());
         assertThat(element("web.myHistory")).hasText(Words.of("ar", "history.myTitle"));
-        assertThat(element("web.sharedSettings")).hasText(Words.of("ar", "sharedSettings.title"));
+        assertThat(element("web.sharedSettings")).containsText(Words.of("ar", "sharedSettings.title"));
         element("web.myHistory").click();
         assertThat(element("myHistory.title")).isVisible();
         assertThat(element("web.accountMenu")).isHidden();
@@ -206,11 +206,11 @@ public class WorkInTheShellTest {
     @Test(description = "Alt+W closes the tab in front", testName = "6e608b7c-5c32-44ad-af97-c53edbd6f5c1", priority = 12)
     public void altWClosesTheTabInFront() {
         final @NotNull Page page = signedIn();
-        Web.openAccount("web.sharedSettings");
-        assertThat(element("web.tab.settings")).hasAttribute("aria-selected", "true");
-        assertThat(element("web.tab.settings.close")).hasAttribute("data-tip", Words.of("ar", "web.close") + " \u2068(Alt+W)\u2069");
+        Web.openAccount("web.myHistory");
+        assertThat(element("web.tab.myHistory")).hasAttribute("aria-selected", "true");
+        assertThat(element("web.tab.myHistory.close")).hasAttribute("data-tip", Words.of("ar", "web.close") + " \u2068(Alt+W)\u2069");
         page.keyboard().press("Alt+KeyW");
-        assertThat(element("web.tab.settings")).hasCount(0);
+        assertThat(element("web.tab.myHistory")).hasCount(0);
         assertThat(element("web.tab.home")).hasAttribute("aria-selected", "true");
     }
 }
