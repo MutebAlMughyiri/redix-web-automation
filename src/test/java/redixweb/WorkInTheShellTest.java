@@ -24,7 +24,7 @@ import static redix.support.Web.element;
 
 public class WorkInTheShellTest {
     /** The side menu's items a person who only reads a project sees and that are not built yet: Documents stays gray, its files off the web. */
-    private static final @NotNull List<String> NOT_BUILT = List.of("projectInfo", "myPermissions", "documents");
+    private static final @NotNull List<String> NOT_BUILT = List.of("projectInfo", "documents");
 
     /** A page signed in as a new person, the shell as a first visit leaves it. */
     private static @NotNull Page signedIn() {
