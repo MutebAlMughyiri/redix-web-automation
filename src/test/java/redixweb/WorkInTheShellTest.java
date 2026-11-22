@@ -171,6 +171,7 @@ public class WorkInTheShellTest {
     public void myAccountInTheStatusBarOpensMyHistorySharedSettingsAndSignOut() {
         signedIn();
         assertThat(element("web.topBar").locator("[id='myAccount.signOut']")).hasCount(0);
+        assertThat(element("web.statusBar").locator("[id='appVersion.line']")).hasCount(0);
         assertThat(element("web.accountMenu")).isHidden();
         element("web.account").click();
         assertThat(element("web.accountMenu")).isVisible();
