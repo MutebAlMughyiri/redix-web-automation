@@ -67,14 +67,16 @@ public class ProjectsAndTheHomeTest {
         assertThat(element("summary.pending")).hasCount(0);
     }
 
-    @Test(description = "Revenue opens its categories, and opening Expenses closes it", testName = "34a45ba1-49fe-48b1-a437-e77cf592c9a8", priority = 3)
-    public void revenueOpensItsCategoriesAndOpeningExpensesClosesIt() {
+    @Test(description = "Revenue and Expenses show their categories side by side, and nothing folds", testName = "34a45ba1-49fe-48b1-a437-e77cf592c9a8", priority = 3)
+    public void revenueAndExpensesShowTheirCategoriesSideBySideAndNothingFolds() {
         atHome(onTheList());
+        assertThat(element("summary.revenue.shares")).isVisible();
+        assertThat(element("summary.expenses.shares")).isVisible();
         element("summary.revenue.body").click();
-        assertThat(element("summary.revenue.card")).hasAttribute("open", "");
-        element("summary.expenses.body").click();
-        assertThat(element("summary.expenses.card")).hasAttribute("open", "");
-        assertThat(element("summary.revenue.card")).not().hasAttribute("open", "");
+        assertThat(element("summary.expenses.shares")).isVisible();
+        assertThat(element("summary.card").locator("details")).hasCount(0);
+        final @NotNull BoundingBox page = element("home.page").boundingBox(), content = element("web.content").boundingBox();
+        Assert.assertTrue(Math.abs((page.x + page.width / 2) - (content.x + content.width / 2)) < 20, "the home stands in the middle of the page");
     }
 
     @Test(description = "The home shows the summary always, with no Hide details", testName = "9a7484ac-812b-4fd8-9c44-32a075f836fc", priority = 4)
