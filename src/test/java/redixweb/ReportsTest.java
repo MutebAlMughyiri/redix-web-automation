@@ -44,10 +44,11 @@ public class ReportsTest {
         assertThat(element("reports.issue")).containsText("2");
     }
 
-    @Test(description = "Expenses opens the item reports, and an item opens its report with its payments", testName = "806982f0-58f0-492f-9ce8-3084fa7e4e9a", priority = 2)
+    @Test(description = "Expenses, from the side menu, opens the item reports, and an item opens its report with its payments", testName = "806982f0-58f0-492f-9ce8-3084fa7e4e9a",
+            priority = 2)
     public void expensesOpensTheItemReportsAndAnItemOpensItsReportWithItsPayments() {
         final @NotNull Page page = onReports(Ledger.withEntries(List.of(100), List.of()));
-        element("reports.expenses").click();
+        Web.openItem("expenses");
         assertThat(element("itemReports.total")).hasText("100.00");
         page.locator("[id^='itemReports.category.'][id$='.body']").filter(new Locator.FilterOptions().setHasText("Works")).click();
         page.locator("[id^='itemReports.item.']").filter(new Locator.FilterOptions().setHasText("Excavation")).first().click();

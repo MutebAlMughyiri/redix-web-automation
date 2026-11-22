@@ -45,7 +45,7 @@ public class WorkInTheShellTest {
         page.mouse().up();
     }
 
-    @Test(description = "Settings opens in a tab from My account, and no side-menu item stands gray", testName = "03cdbc0f-a1f7-4872-b54b-0d962f91913f",
+    @Test(description = "Settings opens in a tab from My account, and no side-menu item stands gray but VAT refund", testName = "03cdbc0f-a1f7-4872-b54b-0d962f91913f",
             priority = 1)
     public void settingsOpensInATabFromMyAccountAndNoSideMenuItemStandsGray() {
         final @NotNull Page page = signedIn();
@@ -54,7 +54,7 @@ public class WorkInTheShellTest {
         assertThat(element("web.tab.settings")).hasAttribute("aria-selected", "true");
         assertThat(element("sharedSettings.title")).hasText(Words.of("ar", "sharedSettings.title"));
         assertThat(element("web.item.settings")).hasCount(0);
-        assertThat(page.locator("#web\\.tree [aria-disabled='true']")).hasCount(0);
+        assertThat(page.locator("#web\\.tree [aria-disabled='true']:not([id='web.item.vat'])")).hasCount(0);
         assertThat(element("web.item.documents")).hasAttribute("hx-get", "/tab/documents");
     }
 
