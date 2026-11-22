@@ -3,9 +3,11 @@
 
 package redixweb;
 
+import com.microsoft.playwright.Download;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import org.jetbrains.annotations.NotNull;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import redix.support.Ledger;
 import redix.support.People;
@@ -61,5 +63,18 @@ public class ReportsTest {
         element("reports.periodic.1").click();
         assertThat(element("periodicReport.title")).containsText("1");
         assertThat(element("periodicReport.difference")).hasText("100.00");
+    }
+
+    @Test(description = "Report 1 hands its PDF and its Excel", testName = "d14c3940-84ef-4331-9b97-9e8ebaf0d228", priority = 4)
+    public void report1HandsItsPdfAndItsExcel() {
+        final @NotNull Page page = onReports(Ledger.withEntries(List.of(100), List.of()));
+        element("reports.issue").click();
+        element("reports.issueConfirm").click();
+        element("reports.periodic.1").click();
+        assertThat(element("periodicReport.title")).isVisible();
+        final @NotNull Download pdf = page.waitForDownload(() -> element("periodicReport.file.pdf").click());
+        Assert.assertEquals(pdf.suggestedFilename(), "report-1.pdf");
+        final @NotNull Download excel = page.waitForDownload(() -> element("periodicReport.file.excel").click());
+        Assert.assertEquals(excel.suggestedFilename(), "report-1.xlsx");
     }
 }
