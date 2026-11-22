@@ -174,6 +174,9 @@ public class WorkInTheShellTest {
         assertThat(element("web.accountMenu")).isHidden();
         element("web.account").click();
         assertThat(element("web.accountMenu")).isVisible();
+        final @NotNull BoundingBox menu = element("web.accountMenu").boundingBox(), account = element("web.account").boundingBox();
+        assertTrue(menu.y + menu.height <= account.y + 1 && Math.abs(menu.x - account.x) < 200, "My account opens above the person's name: " + menu.y + " for " + account.y);
+        assertThat(element("web.accountMenu.name")).hasText(element("web.account.name").textContent());
         assertThat(element("web.myHistory")).hasText(Words.of("ar", "history.myTitle"));
         assertThat(element("web.sharedSettings")).hasText(Words.of("ar", "sharedSettings.title"));
         element("web.myHistory").click();
