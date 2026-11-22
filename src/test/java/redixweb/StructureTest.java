@@ -85,4 +85,45 @@ public class StructureTest {
         element("web.item.categories").click();
         assertThat(itemRow(page, "Paint").locator("xpath=following-sibling::tr[1]")).containsText("Tiles");
     }
+
+    /** Columns of the item Excavation, from its panel. */
+    private static void onExcavationColumns(final @NotNull Page page) {
+        itemRow(page, "Excavation").click();
+        page.locator("[id^='categories.itemColumns.']").click();
+        assertThat(element("columns.title")).containsText("Excavation");
+    }
+
+    @Test(description = "New column on this item, Edit, and Delete asked first, as the app's dialogs", testName = "5e1c8a3f-2d7b-4f9e-b6a4-8c0d3e7f1a52", priority = 3)
+    public void newColumnOnThisItemEditAndDeleteAskedFirstAsTheAppsDialogs() {
+        final @NotNull Page page = onCategories();
+        onExcavationColumns(page);
+        element("columns.add").click();
+        element("columns.columnName").fill("Notes");
+        element("column.save").click();
+        assertThat(element("column.title")).hasText("Notes");
+        element("columns.edit").click();
+        element("columns.columnName").fill("Remarks");
+        element("column.save").click();
+        assertThat(element("column.title")).hasText("Remarks");
+        final @NotNull Locator row = page.locator("tr[id^='columns.row.']").filter(new Locator.FilterOptions().setHasText("Remarks"));
+        assertThat(row).isVisible();
+        element("columns.delete").click();
+        assertThat(element("column.deleteQuestion")).hasText(Words.of("ar", "swipe.question"));
+        element("column.deleteConfirm").click();
+        assertThat(row).isHidden();
+    }
+
+    @Test(description = "A template's new column asks whether it reaches every item", testName = "b9f4d2e7-3a6c-4e1b-8d5f-6a2c9e0b7d18", priority = 4)
+    public void aTemplatesNewColumnAsksWhetherItReachesEveryItem() {
+        final @NotNull Page page = onCategories();
+        onExcavationColumns(page);
+        element("columns.template").click();
+        assertThat(element("columns.template")).hasAttribute("aria-pressed", "true");
+        element("columns.add").click();
+        element("columns.columnName").fill("Order number");
+        element("applyToAll.apply").click();
+        assertThat(element("column.title")).hasText("Order number");
+        element("columns.thisItem").click();
+        assertThat(page.locator("tr[id^='columns.row.']").filter(new Locator.FilterOptions().setHasText("Order number"))).isVisible();
+    }
 }
