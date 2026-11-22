@@ -151,4 +151,23 @@ public class EntriesTest {
         assertThat(element("addEntry.remaining")).hasText("(200.00)");
         assertThat(element("addEntry.overrun")).hasText(Words.of("ar", "contractorPayments.overrun"));
     }
+
+    @Test(description = "The details panel follows the tab in front: each tab brings back what it selected", testName = "f3d82fe5-d344-4323-9c8e-71c07a7f2e1d", priority = 10)
+    public void theDetailsPanelFollowsTheTabInFrontEachTabBringsBackWhatItSelected() {
+        final @NotNull Ledger.Kept kept = Ledger.withEntries(List.of(100, 200), List.of());
+        final @NotNull Page page = onTheList(kept);
+        element("entries.row." + kept.entryIds().get(0)).click();
+        assertThat(element("entry.amount")).hasText("100.00");
+        element("web.item.accounts").click();
+        assertThat(element("accounts.title")).isVisible();
+        assertThat(page.locator("[id='entry.amount']")).hasCount(0);
+        page.locator("[id^='accounts.row.']").filter(new Locator.FilterOptions().setHasText("Bank")).click();
+        assertThat(element("account.title")).hasText("Bank");
+        element("web.tab.entries.title").click();
+        assertThat(element("entry.amount")).hasText("100.00");
+        assertThat(element("entries.row." + kept.entryIds().get(0))).hasAttribute("aria-selected", "true");
+        element("web.tab.accounts.title").click();
+        assertThat(element("account.title")).hasText("Bank");
+    }
 }
+
