@@ -126,4 +126,33 @@ public class StructureTest {
         element("columns.thisItem").click();
         assertThat(page.locator("tr[id^='columns.row.']").filter(new Locator.FilterOptions().setHasText("Order number"))).isVisible();
     }
+
+    @Test(description = "New subgroup, Rename, a table moved with Alt+Up, and Delete asked first, on an item's Tables", testName = "3c7a9e15-8b2d-4f6c-a1e9-5d0b7f2c4e83",
+            priority = 5)
+    public void newSubgroupRenameATableMovedWithAltUpAndDeleteAskedFirstOnAnItemsTables() {
+        final @NotNull Page page = onCategories();
+        itemRow(page, "Excavation").click();
+        element("categories.tables").click();
+        assertThat(element("tables.title")).containsText("Excavation");
+        element("tables.add").click();
+        element("table.name").fill("Ground floor");
+        element("table.save").click();
+        assertThat(element("table.title")).hasText("Ground floor");
+        element("tables.rename").click();
+        element("table.name").fill("Basement");
+        element("table.save").click();
+        assertThat(element("table.title")).hasText("Basement");
+        final @NotNull Locator rows = page.locator("tr[id^='tables.row.']");
+        final @NotNull Locator basement = rows.filter(new Locator.FilterOptions().setHasText("Basement"));
+        basement.focus();
+        page.keyboard().press("Alt+ArrowUp");
+        assertThat(rows.first()).containsText("Basement");
+        page.locator("[id='web.tab.itemTables.title']").click();
+        assertThat(rows.first()).containsText("Basement");
+        basement.click();
+        element("tables.delete").click();
+        assertThat(element("table.deleteQuestion")).hasText(Words.of("ar", "swipe.question"));
+        element("table.deleteConfirm").click();
+        assertThat(basement).isHidden();
+    }
 }
