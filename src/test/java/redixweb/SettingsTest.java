@@ -9,6 +9,7 @@ import org.testng.annotations.Test;
 import redix.support.Ledger;
 import redix.support.People;
 import redix.support.Web;
+import redix.support.Words;
 
 import java.util.List;
 
@@ -32,5 +33,24 @@ public class SettingsTest {
         assertThat(element("sharedSettings.entriesShownOption.8")).hasAttribute("selected", "");
         element("sharedSettings.theme.system").click();
         assertThat(page.locator("html")).not().hasAttribute("data-theme", "dark");
+    }
+
+    @Test(description = "My email asks for the code sent to the new email, and a wrong code is refused with the app's words", testName = "8b4e1d7a-2c9f-4a6e-b3d5-7f0c2a9e6b48",
+            priority = 2)
+    public void myEmailAsksForTheCodeSentToTheNewEmailAndAWrongCodeIsRefusedWithTheAppsWords() {
+        final @NotNull Ledger.Kept kept = Ledger.withEntries(List.of(), List.of());
+        Web.page();
+        Web.signIn(kept.manager().username(), People.PASSWORD);
+        element("web.item.settings").click();
+        element("sharedSettings.changeEmail").click();
+        assertThat(element("myEmail.email")).isFocused();
+        final @NotNull String address = "new-" + kept.manager().username() + "@redix.test";
+        element("myEmail.email").fill(address);
+        element("myEmail.send").click();
+        assertThat(element("myEmail.sentTo")).containsText(address);
+        assertThat(element("myEmail.code")).isFocused();
+        element("myEmail.code").fill("000000");
+        element("myEmail.save").click();
+        assertThat(element("myEmail.refusal")).hasText(Words.of("ar", "auth.codeWrong"));
     }
 }
