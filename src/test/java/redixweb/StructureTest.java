@@ -148,6 +148,7 @@ public class StructureTest {
         page.keyboard().press("Alt+ArrowUp");
         assertThat(rows.first()).containsText("Basement");
         page.locator("[id='web.tab.itemTables.title']").click();
+        assertThat(element("table.title")).isHidden();
         assertThat(rows.first()).containsText("Basement");
         basement.click();
         element("tables.delete").click();
