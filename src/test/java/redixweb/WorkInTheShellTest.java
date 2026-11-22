@@ -14,6 +14,8 @@ import redix.support.People.Person;
 import redix.support.Web;
 import redix.support.Words;
 
+import java.util.List;
+
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -21,7 +23,8 @@ import static org.testng.Assert.assertTrue;
 import static redix.support.Web.element;
 
 public class WorkInTheShellTest {
-    /** The side menu's items no feature has built yet, which stand gray (#161 R15). */
+    /** The side menu's items a person who only reads a project sees and that are not built yet: Documents stays gray, its files off the web. */
+    private static final @NotNull List<String> NOT_BUILT = List.of("projectInfo", "myPermissions", "documents");
 
     /** A page signed in as a new person, the shell as a first visit leaves it. */
     private static @NotNull Page signedIn() {
@@ -46,15 +49,17 @@ public class WorkInTheShellTest {
         page.mouse().up();
     }
 
-    @Test(description = "Settings opens in a tab, and no item of the side menu stands gray", testName = "03cdbc0f-a1f7-4872-b54b-0d962f91913f", priority = 1)
-    public void settingsOpensInATabAndNoItemOfTheSideMenuStandsGray() {
-        final @NotNull Page page = signedIn();
+    @Test(description = "Settings opens in a tab, and the items not built stand gray", testName = "03cdbc0f-a1f7-4872-b54b-0d962f91913f", priority = 1)
+    public void settingsOpensInATabAndTheItemsNotBuiltStandGray() {
+        signedIn();
         assertThat(element("web.tab.home")).hasAttribute("aria-selected", "true");
         element("web.item.settings").click();
         assertThat(element("web.tab.settings")).hasAttribute("aria-selected", "true");
         assertThat(element("sharedSettings.title")).hasText(Words.of("ar", "sharedSettings.title"));
         assertThat(element("web.item.settings")).hasAttribute("aria-current", "true");
-        assertThat(page.locator("[id^='web.item.'][aria-disabled='true']")).hasCount(0);
+        for (final @NotNull String item : NOT_BUILT) {
+            assertThat(element("web.item." + item)).hasAttribute("aria-disabled", "true");
+        }
     }
 
     @Test(description = "Closing the last tab asks to pick from the side menu", testName = "90259f56-671c-4054-88f6-cfddafcefd62", priority = 2)
