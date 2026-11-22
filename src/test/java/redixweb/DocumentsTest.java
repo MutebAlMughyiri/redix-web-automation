@@ -113,14 +113,19 @@ public class DocumentsTest {
         return ((Number) element("web.details").evaluate("panel => Math.round(panel.getBoundingClientRect().width)")).intValue();
     }
 
-    /** Drags the details panel's line by pixels toward the content, to the right in Arabic: a positive number widens the panel. */
+    /**
+     * Drags the details panel's line by pixels toward the content, to the right in Arabic: a positive number widens the panel. It waits for the
+     * View menu to keep the width, so drags one after another are kept in their order over a slow network too.
+     */
     private static void dragTheDetailsLine(final @NotNull Page page, final int pixels) {
         final @NotNull BoundingBox line = element("web.detailsLine").boundingBox();
         final double x = line.x + line.width / 2, y = line.y + 200;
-        page.mouse().move(x, y);
-        page.mouse().down();
-        page.mouse().move(x + pixels, y, new Mouse.MoveOptions().setSteps(8));
-        page.mouse().up();
+        page.waitForResponse(saved -> saved.url().endsWith("/view"), () -> {
+            page.mouse().move(x, y);
+            page.mouse().down();
+            page.mouse().move(x + pixels, y, new Mouse.MoveOptions().setSteps(8));
+            page.mouse().up();
+        });
     }
 
     @Test(description = "The details panel's line drags it wider and narrower within its limits, and a reload keeps its width",
@@ -135,7 +140,7 @@ public class DocumentsTest {
         Assert.assertEquals(detailsWidth(), 560, "no wider than 560");
         dragTheDetailsLine(page, -2000);
         Assert.assertEquals(detailsWidth(), 240, "no narrower than 240");
-        page.waitForResponse(saved -> saved.url().endsWith("/view"), () -> dragTheDetailsLine(page, 60));
+        dragTheDetailsLine(page, 60);
         final int width = detailsWidth();
         page.reload();
         row(page, "Ground floor plan").click();
