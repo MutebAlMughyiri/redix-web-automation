@@ -52,4 +52,14 @@ public class ReportsTest {
         assertThat(element("itemReport.title")).hasText("Excavation");
         assertThat(page.locator("[id^='itemReport.row.']").filter(new Locator.FilterOptions().setHasText("Payment 1")).first()).isVisible();
     }
+
+    @Test(description = "Report 1, once issued, opens with its expenses against the previous report", testName = "fcace67f-7155-4843-b16e-3f459e2a804a", priority = 3)
+    public void report1OnceIssuedOpensWithItsExpensesAgainstThePreviousReport() {
+        onReports(Ledger.withEntries(List.of(100), List.of()));
+        element("reports.issue").click();
+        element("reports.issueConfirm").click();
+        element("reports.periodic.1").click();
+        assertThat(element("periodicReport.title")).containsText("1");
+        assertThat(element("periodicReport.difference")).hasText("100.00");
+    }
 }
