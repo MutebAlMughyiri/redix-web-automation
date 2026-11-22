@@ -3,16 +3,20 @@
 
 package redixweb;
 
+import com.microsoft.playwright.Download;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.FilePayload;
 import com.microsoft.playwright.options.SelectOption;
 import org.jetbrains.annotations.NotNull;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import redix.support.Ledger;
 import redix.support.People;
 import redix.support.Web;
 import redix.support.Words;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
@@ -168,6 +172,24 @@ public class EntriesTest {
         assertThat(element("entries.row." + kept.entryIds().get(0))).hasAttribute("aria-selected", "true");
         element("web.tab.accounts.title").click();
         assertThat(element("account.title")).hasText("Bank");
+    }
+
+    @Test(description = "Add entry keeps the invoice chosen, through a change of table, and the entry's panel hands it over",
+            testName = "7b3e9a1c-6d4f-4e2b-a8c5-0f1d7e9b3a62", priority = 11)
+    public void addEntryKeepsTheInvoiceChosenThroughAChangeOfTableAndTheEntrysPanelHandsItOver() {
+        final @NotNull Page page = onTheList(Ledger.withEntries(List.of(), List.of()));
+        element("entries.new").click();
+        assertThat(element("addEntry.title")).isVisible();
+        element("addEntry.file").setInputFiles(new FilePayload("invoice.pdf", "application/pdf", "%PDF-1.4 invoice".getBytes(StandardCharsets.UTF_8)));
+        element("addEntry.table").selectOption(new SelectOption().setLabel("Excavation"));
+        assertThat(element("addEntry.table").locator("option[selected]")).hasText("Excavation");
+        element("addEntry.description").fill("Web invoice");
+        element("addEntry.amount").fill("900");
+        element("addEntry.send").click();
+        assertThat(element("addEntry.message")).hasText(Words.of("ar", "expenses.sent"));
+        assertThat(element("entry.file.0")).hasText("invoice.pdf");
+        final @NotNull Download invoice = page.waitForDownload(() -> element("entry.file.0").click());
+        Assert.assertEquals(invoice.suggestedFilename(), "invoice.pdf");
     }
 }
 
