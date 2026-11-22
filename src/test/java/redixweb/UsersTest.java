@@ -120,4 +120,17 @@ public class UsersTest {
         element("users.permissions").click();
         assertThat(element("userPermissions.recordEntries.input")).not().isChecked();
     }
+
+    @Test(description = "The project's only manager of users cannot disable themselves, and the app's words say why", testName = "1664867e-b5b5-45f1-8bd5-b8996e41ff35",
+            priority = 6)
+    public void theProjectsOnlyManagerOfUsersCannotDisableThemselvesAndTheAppsWordsSayWhy() {
+        final @NotNull Ledger.Kept kept = Ledger.withEntries(List.of(), List.of());
+        final @NotNull Page page = onUsers(kept);
+        row(page, kept.manager().username()).click();
+        assertThat(element("user.title")).hasText(kept.manager().displayName());
+        element("users.disable").click();
+        element("user.disableConfirm").click();
+        assertThat(element("user.refusal")).hasText(Words.of("ar", "users.lastManager"));
+        assertThat(row(page, kept.manager().username())).not().containsText(Words.of("ar", "users.disabled"));
+    }
 }
