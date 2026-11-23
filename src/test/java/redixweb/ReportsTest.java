@@ -44,16 +44,23 @@ public class ReportsTest {
         assertThat(element("reports.issue")).containsText("2");
     }
 
-    @Test(description = "Expenses, from the side menu, opens the item reports, and an item opens its report with its payments", testName = "806982f0-58f0-492f-9ce8-3084fa7e4e9a",
-            priority = 2)
-    public void expensesOpensTheItemReportsAndAnItemOpensItsReportWithItsPayments() {
+    @Test(description = "Expenses, from the side menu, folds its categories open onto their items; an item lists its tables, and a table opens alone with its payments",
+            testName = "806982f0-58f0-492f-9ce8-3084fa7e4e9a", priority = 2)
+    public void expensesFoldsOpenOntoItemsAnItemListsItsTablesAndATableOpensAloneWithItsPayments() {
         final @NotNull Page page = onReports(Ledger.withEntries(List.of(100), List.of()));
         Web.openItem("expenses");
         assertThat(element("itemReports.total")).hasText("100.00");
+        final @NotNull Locator excavation = page.locator("[id^='itemReports.item.']").filter(new Locator.FilterOptions().setHasText("Excavation")).first();
+        assertThat(excavation).isHidden();
         page.locator("[id^='itemReports.category.'][id$='.body']").filter(new Locator.FilterOptions().setHasText("Works")).click();
-        page.locator("[id^='itemReports.item.']").filter(new Locator.FilterOptions().setHasText("Excavation")).first().click();
+        excavation.click();
         assertThat(element("itemReport.title")).hasText("Excavation");
-        assertThat(page.locator("[id^='itemReport.row.']").filter(new Locator.FilterOptions().setHasText("Payment 1")).first()).isVisible();
+        assertThat(element("web.tab.itemReport.title")).hasText("Excavation");
+        page.locator("tr[id^='itemReport.table.']").first().click();
+        assertThat(element("itemReport.path.item")).hasText("Excavation");
+        assertThat(page.locator("tr[id^='itemReport.row.']").filter(new Locator.FilterOptions().setHasText("Payment 1")).first()).isVisible();
+        element("itemReport.path.item").click();
+        assertThat(element("itemReport.title")).hasText("Excavation");
     }
 
     @Test(description = "Report 1, once issued, opens with its expenses against the previous report", testName = "fcace67f-7155-4843-b16e-3f459e2a804a", priority = 3)
