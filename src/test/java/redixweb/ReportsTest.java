@@ -78,4 +78,33 @@ public class ReportsTest {
         final @NotNull Download excel = page.waitForDownload(() -> element("periodicReport.file.excel").click());
         Assert.assertEquals(excel.suggestedFilename(), "report-1.xlsx");
     }
+
+    @Test(description = "Back on Expenses from an item's report, Expenses stays in front", testName = "117c7313-7171-4156-8402-64aee15b3f9e", priority = 5)
+    public void backOnExpensesFromAnItemsReportExpensesStaysInFront() {
+        final @NotNull Page page = onReports(Ledger.withEntries(List.of(100), List.of()));
+        Web.openItem("expenses");
+        page.locator("[id^='itemReports.category.'][id$='.body']").filter(new Locator.FilterOptions().setHasText("Works")).click();
+        page.locator("[id^='itemReports.item.']").filter(new Locator.FilterOptions().setHasText("Excavation")).first().click();
+        assertThat(element("itemReport.title")).hasText("Excavation");
+        element("web.tab.expenses.title").click();
+        assertThat(element("itemReports.total")).hasText("100.00");
+        page.waitForTimeout(1000);
+        assertThat(element("web.tab.expenses")).hasAttribute("aria-selected", "true");
+        assertThat(element("itemReport.title")).not().isAttached();
+    }
+
+    @Test(description = "An item's report, after a reload and Expenses, still shows its item", testName = "c24ba704-3b4d-4460-af7f-50e080db5bc0", priority = 6)
+    public void anItemsReportAfterAReloadAndExpensesStillShowsItsItem() {
+        final @NotNull Page page = onReports(Ledger.withEntries(List.of(100), List.of()));
+        Web.openItem("expenses");
+        page.locator("[id^='itemReports.category.'][id$='.body']").filter(new Locator.FilterOptions().setHasText("Works")).click();
+        page.locator("[id^='itemReports.item.']").filter(new Locator.FilterOptions().setHasText("Excavation")).first().click();
+        assertThat(element("itemReport.title")).hasText("Excavation");
+        page.reload();
+        assertThat(element("itemReport.title")).hasText("Excavation");
+        element("web.tab.expenses.title").click();
+        assertThat(element("itemReports.total")).isVisible();
+        element("web.tab.itemReport.title").click();
+        assertThat(element("itemReport.title")).hasText("Excavation");
+    }
 }
