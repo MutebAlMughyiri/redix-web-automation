@@ -228,4 +228,26 @@ public class EntriesTest {
         element("entries.row." + kept.entryIds().get(0)).click();
         assertThat(element("entry.title")).isVisible();
     }
+
+    @Test(description = "Quick add adds a missing supplier from Add entry and picks it, and a VAT number another supplier holds offers that one",
+            testName = "17794bd1-4561-4b21-b906-2d5766bb1790", priority = 14)
+    public void quickAddAddsAMissingSupplierFromAddEntryAndPicksItAndAHeldVatNumberOffersThatOne() {
+        addingToExcavation(Ledger.withEntries(List.of(), List.of()));
+        element("addEntry.supplierSearch").fill("Web supplier");
+        element("addEntry.quickAddOpen").click();
+        assertThat(element("addEntry.quickAddName")).hasValue("Web supplier");
+        element("addEntry.quickAddVatNumber").fill("300000000000003");
+        element("addEntry.quickAddSave").click();
+        assertThat(element("addEntry.supplier").locator("option[selected]")).hasText("Web supplier");
+        assertThat(element("addEntry.quickAdd")).hasCount(0);
+        element("addEntry.quickAddOpen").click();
+        element("addEntry.quickAddName").fill("Another supplier");
+        element("addEntry.quickAddVatNumber").fill("300000000000003");
+        element("addEntry.quickAddName").press("Enter");
+        assertThat(element("addEntry.quickAddRefusal")).hasText(Words.of("ar", "suppliers.vatNumberTaken"));
+        assertThat(element("addEntry.title")).isVisible();
+        element("addEntry.quickAddUseExisting").click();
+        assertThat(element("addEntry.supplier").locator("option[selected]")).hasText("Web supplier");
+        assertThat(element("addEntry.quickAdd")).hasCount(0);
+    }
 }
