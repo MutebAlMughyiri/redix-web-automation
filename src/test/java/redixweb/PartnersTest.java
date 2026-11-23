@@ -28,15 +28,16 @@ public class PartnersTest {
         return page;
     }
 
-    @Test(description = "Partners lists the capital and a partner with no login, whose panel says no movements yet", testName = "4d8151a3-e15b-4e97-864e-3c05ebfa7633", priority = 1)
-    public void partnersListsTheCapitalAndAPartnerWithNoLoginWhosePanelSaysNoMovementsYet() {
+    @Test(description = "Partners lists the capital and a partner with no login, whose panel lists no movements", testName = "4d8151a3-e15b-4e97-864e-3c05ebfa7633", priority = 1)
+    public void partnersListsTheCapitalAndAPartnerWithNoLoginWhosePanelListsNoMovements() {
         final @NotNull Page page = onPartners(Ledger.withPartner("Partner A"));
         assertThat(element("partners.total")).hasText("0.00");
         final @NotNull Locator partner = page.locator("[id^='partners.row.']").filter(new Locator.FilterOptions().setHasText("Partner A"));
         assertThat(partner).containsText(Words.of("ar", "partners.noLogin"));
         partner.click();
         assertThat(element("partner.title")).hasText("Partner A");
-        assertThat(element("partner.noMovements")).hasText(Words.of("ar", "capital.noMovements"));
+        assertThat(element("partner.balance")).isVisible();
+        assertThat(page.locator("[id^='partner.movements'], [id='partner.noMovements']")).hasCount(0);
     }
 
     @Test(description = "New partner adds a partner, and one with no capital is deleted, asked first", testName = "c764702a-cfc1-48c1-9831-d495a69ea3ab", priority = 2)
