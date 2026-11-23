@@ -5,7 +5,6 @@ package redixweb;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import com.microsoft.playwright.options.SelectOption;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 import redix.support.Ledger;
@@ -36,7 +35,9 @@ public class HistoryTest {
         assertThat(element("projectHistory.title")).hasText(Words.of("ar", "history.projectTitle"));
         assertThat(page.locator("[id^='projectHistory.line.']").first()).isVisible();
         Web.openSearch("projectHistory");
-        element("projectHistory.kindChoice").selectOption(new SelectOption().setValue("accounts"));
+        element("projectHistory.kindChoice").click();
+        element("projectHistory.kind.accounts").click();
+        assertThat(element("projectHistory.kindChoice.chosen")).hasText(Words.of("ar", "history.area.accounts"));
         assertThat(page.locator("[id^='projectHistory.line.']").filter(new Locator.FilterOptions().setHasText("Bank")).first()).isVisible();
     }
 

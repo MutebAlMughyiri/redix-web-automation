@@ -54,8 +54,12 @@ public class EntriesTest {
     public void aStatusFilterNarrowsTheListAndClearBringsItAllBack() {
         final @NotNull Page page = onTheList(Ledger.withEntries(List.of(100, 200), List.of(300)));
         Web.openSearch("entries");
+        element("entries.statusChoice").click();
         element("entries.status.approved").click();
+        assertThat(rows(page)).hasCount(3);
+        page.keyboard().press("Escape");
         assertThat(rows(page)).hasCount(2);
+        assertThat(element("entries.statusChoice.chosen")).hasText(Words.of("ar", "entries.approved"));
         assertThat(element("entries.status.approved").locator("input")).isChecked();
         element("entries.clear").click();
         assertThat(rows(page)).hasCount(3);
