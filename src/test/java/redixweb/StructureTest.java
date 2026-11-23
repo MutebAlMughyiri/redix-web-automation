@@ -78,11 +78,11 @@ public class StructureTest {
         page.keyboard().press("Alt+ArrowDown");
         assertThat(page.locator("tr[id^='categories.item.']").filter(new Locator.FilterOptions().setHasText("Tiles")).locator("xpath=following-sibling::tr[1]"))
                 .containsText("Paint");
-        Web.openItem("categories");
+        page.waitForResponse(listed -> listed.url().contains("/tab/categories"), () -> Web.openItem("categories"));
         assertThat(itemRow(page, "Tiles").locator("xpath=following-sibling::tr[1]")).containsText("Paint");
         itemRow(page, "Paint").dragTo(itemRow(page, "Tiles"), new Locator.DragToOptions().setTargetPosition(10, 2));
         assertThat(itemRow(page, "Paint").locator("xpath=following-sibling::tr[1]")).containsText("Tiles");
-        Web.openItem("categories");
+        page.waitForResponse(listed -> listed.url().contains("/tab/categories"), () -> Web.openItem("categories"));
         assertThat(itemRow(page, "Paint").locator("xpath=following-sibling::tr[1]")).containsText("Tiles");
     }
 
