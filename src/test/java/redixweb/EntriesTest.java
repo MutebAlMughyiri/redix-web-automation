@@ -210,4 +210,22 @@ public class EntriesTest {
         assertThat(element("entries.search")).hasCount(0);
         assertThat(rows(page)).hasCount(3);
     }
+
+    @Test(description = "The details panel follows the selected row until it is closed, then stays closed until a row is chosen again",
+            testName = "d9594a88-ff02-4cbb-8f46-56ba250187dc", priority = 13)
+    public void theDetailsPanelFollowsTheSelectedRowUntilItIsClosed() {
+        final @NotNull Ledger.Kept kept = Ledger.withEntries(List.of(100, 4875), List.of(300));
+        final @NotNull Page page = onTheList(kept);
+        element("entries.row." + kept.entryIds().get(1)).click();
+        assertThat(element("entry.title")).isVisible();
+        Web.openSearch("entries");
+        assertThat(element("entry.title")).isVisible();
+        element("entry.close").click();
+        assertThat(element("web.details")).isEmpty();
+        element("entries.searchToggle").click();
+        assertThat(rows(page)).hasCount(3);
+        assertThat(element("web.details")).isEmpty();
+        element("entries.row." + kept.entryIds().get(0)).click();
+        assertThat(element("entry.title")).isVisible();
+    }
 }
