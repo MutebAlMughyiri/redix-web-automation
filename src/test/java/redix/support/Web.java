@@ -80,6 +80,12 @@ public final class Web {
         element("web.item." + name).click();
     }
 
+    /** Opens the search of the page whose ids start with page, folded until asked for, and waits for its field (redix-api #180). */
+    public static void openSearch(final @NotNull String page) {
+        element(page + ".searchToggle").click();
+        assertThat(element(page + ".search")).isFocused();
+    }
+
     /** Opens My account in the status bar and hovers Settings, so its list stands open beside the menu (redix-api findings row 321). */
     public static void openSettings() {
         element("web.account").click();

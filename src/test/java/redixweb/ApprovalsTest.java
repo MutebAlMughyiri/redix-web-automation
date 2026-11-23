@@ -40,6 +40,7 @@ public class ApprovalsTest {
         final @NotNull Page page = onApprovals(kept);
         assertThat(rows(page)).hasCount(2);
         assertThat(element("approvals.card." + kept.entryIds().get(0))).hasCount(0);
+        Web.openSearch("approvals");
         element("approvals.contractorPayments").click();
         assertThat(element("approvals.empty")).hasText(Words.of("ar", "approvals.empty"));
     }

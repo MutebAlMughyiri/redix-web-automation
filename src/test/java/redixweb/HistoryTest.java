@@ -35,6 +35,7 @@ public class HistoryTest {
         element("web.item.projectHistory").click();
         assertThat(element("projectHistory.title")).hasText(Words.of("ar", "history.projectTitle"));
         assertThat(page.locator("[id^='projectHistory.line.']").first()).isVisible();
+        Web.openSearch("projectHistory");
         element("projectHistory.kindChoice").selectOption(new SelectOption().setValue("accounts"));
         assertThat(page.locator("[id^='projectHistory.line.']").filter(new Locator.FilterOptions().setHasText("Bank")).first()).isVisible();
     }

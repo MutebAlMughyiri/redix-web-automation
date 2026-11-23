@@ -53,6 +53,7 @@ public class EntriesTest {
     @Test(description = "A status filter narrows the list, and Clear brings it all back", testName = "802b5170-7c44-44c9-974f-a8f1c8150770", priority = 2)
     public void aStatusFilterNarrowsTheListAndClearBringsItAllBack() {
         final @NotNull Page page = onTheList(Ledger.withEntries(List.of(100, 200), List.of(300)));
+        Web.openSearch("entries");
         element("entries.status.approved").click();
         assertThat(rows(page)).hasCount(2);
         assertThat(element("entries.status.approved").locator("input")).isChecked();
@@ -80,6 +81,7 @@ public class EntriesTest {
     public void theSearchFindsAnEntryByItsAmount() {
         final @NotNull Ledger.Kept kept = Ledger.withEntries(List.of(100, 4875), List.of(300));
         final @NotNull Page page = onTheList(kept);
+        Web.openSearch("entries");
         element("entries.search").fill("4,875");
         assertThat(rows(page)).hasCount(1);
         assertThat(element("entries.row." + kept.entryIds().get(1))).isVisible();
@@ -191,5 +193,21 @@ public class EntriesTest {
         final @NotNull Download invoice = page.waitForDownload(() -> element("entry.file.0").click());
         Assert.assertEquals(invoice.suggestedFilename(), "invoice.pdf");
     }
-}
 
+    @Test(description = "The search is folded until «بحث» or / opens it, typing keeps it open, and closing it clears its filter",
+            testName = "fa664b3d-b281-4687-9310-fd58bcea39b5", priority = 12)
+    public void theSearchIsFoldedUntilAskedForTypingKeepsItOpenAndClosingClearsItsFilter() {
+        final @NotNull Ledger.Kept kept = Ledger.withEntries(List.of(100, 4875), List.of(300));
+        final @NotNull Page page = onTheList(kept);
+        assertThat(element("entries.search")).hasCount(0);
+        assertThat(element("entries.searchToggle")).hasAttribute("aria-expanded", "false");
+        page.keyboard().press("/");
+        assertThat(element("entries.search")).isFocused();
+        page.keyboard().type("4,875");
+        assertThat(rows(page)).hasCount(1);
+        assertThat(element("entries.search")).hasValue("4,875");
+        element("entries.searchToggle").click();
+        assertThat(element("entries.search")).hasCount(0);
+        assertThat(rows(page)).hasCount(3);
+    }
+}
