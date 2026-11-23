@@ -128,4 +128,17 @@ public class SignInWithUsernameAndPasswordTest {
         assertThat(element("signIn.username")).hasCount(0);
         assertThat(element("web.shell")).not().hasClass(Pattern.compile("\\barriving\\b"));
     }
+
+    @Test(description = "Signing in opens Home in front, the tabs left open staying behind it", testName = "804f99c6-25ba-4f8e-81c3-41b687686131", priority = 9)
+    public void signingInOpensHomeInFrontTheTabsLeftOpenStayingBehindIt() {
+        final @NotNull Person person = People.signedUp();
+        Web.page();
+        Web.signIn(person.username(), People.PASSWORD);
+        Web.openAccount("web.myHistory");
+        assertThat(element("web.tab.myHistory")).hasAttribute("aria-selected", "true");
+        Web.openAccount("myAccount.signOut");
+        Web.signIn(person.username(), People.PASSWORD);
+        assertThat(element("web.tab.home")).hasAttribute("aria-selected", "true");
+        assertThat(element("web.tab.myHistory")).hasAttribute("aria-selected", "false");
+    }
 }
